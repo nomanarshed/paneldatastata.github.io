@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Data Analysis in Stata — Complete Video Course</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:     #0f0e0b;
+    --paper:   #f5f0e8;
+    --cream:   #ede7d9;
+    --rule:    #ccc4b0;
+    --muted:   #7a7060;
+    --stage1:  #2c5f8a;
+    --stage2:  #1a7a4a;
+    --stage3:  #8b4513;
+    --stage4:  #6b2d8b;
+    --gold:    #e8c88a;
+    --mono:    'IBM Plex Mono', monospace;
+    --serif:   'Source Serif 4', Georgia, serif;
+    --display: 'Playfair Display', Georgia, serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 72px 40px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,.04) 59px, rgba(255,255,255,.04) 60px),
+      repeating-linear-gradient(0deg,  transparent, transparent 59px, rgba(255,255,255,.04) 59px, rgba(255,255,255,.04) 60px);
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--stage1) 0%, var(--stage2) 33%, var(--stage3) 66%, var(--stage4) 100%);
+  }
+  .header-inner { max-width: 860px; margin: 0 auto; position: relative; }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,.5);
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    margin-bottom: 20px;
+  }
+  h1 em { font-style: italic; color: var(--gold); }
+  .header-sub {
+    font-size: 1.05rem;
+    color: rgba(245,240,232,.75);
+    max-width: 580px;
+    line-height: 1.6;
+    margin-bottom: 36px;
+  }
+  .header-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; gap: 2px; }
+  .stat-num { font-family: var(--display); font-size: 2rem; font-weight: 700; color: var(--gold); }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,.5);
+  }
+
+  /* ── TOC ── */
+  nav.toc {
+    background: var(--cream);
+    border-bottom: 1px solid var(--rule);
+    padding: 20px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(15,14,11,.07);
+  }
+  .toc-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .toc-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  .toc-pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid currentColor;
+    text-decoration: none;
+    transition: all .18s;
+    white-space: nowrap;
+  }
+  .toc-pill.s1 { color: var(--stage1); }
+  .toc-pill.s2 { color: var(--stage2); }
+  .toc-pill.s3 { color: var(--stage3); }
+  .toc-pill.s4 { color: var(--stage4); }
+  .toc-pill.s1:hover { background: var(--stage1); color: white; border-color: var(--stage1); }
+  .toc-pill.s2:hover { background: var(--stage2); color: white; border-color: var(--stage2); }
+  .toc-pill.s3:hover { background: var(--stage3); color: white; border-color: var(--stage3); }
+  .toc-pill.s4:hover { background: var(--stage4); color: white; border-color: var(--stage4); }
+
+  /* ── MAIN ── */
+  main { max-width: 860px; margin: 0 auto; padding: 60px 40px 80px; }
+
+  /* ── INTRO ── */
+  .intro {
+    margin-bottom: 56px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .intro p + p { margin-top: 16px; }
+  .intro strong { font-weight: 600; border-bottom: 1.5px solid #c0392b; }
+
+  /* ── STAGE ── */
+  .stage {
+    margin-bottom: 48px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .stage-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .stage-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 3px;
+    color: var(--paper);
+    flex-shrink: 0;
+  }
+  .s1 .stage-badge { background: var(--stage1); }
+  .s2 .stage-badge { background: var(--stage2); }
+  .s3 .stage-badge { background: var(--stage3); }
+  .s4 .stage-badge { background: var(--stage4); }
+  .stage-title {
+    font-family: var(--display);
+    font-size: 1.65rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+  }
+  .stage-intro {
+    color: var(--muted);
+    font-size: .93rem;
+    margin-bottom: 28px;
+    max-width: 700px;
+    font-style: italic;
+    line-height: 1.65;
+  }
+
+  /* ── TRANSITION BLOCK ── */
+  .stage-transition {
+    background: var(--ink);
+    color: rgba(245,240,232,.82);
+    border-radius: 4px;
+    padding: 28px 36px;
+    margin: -16px 0 48px;
+    font-size: .9rem;
+    line-height: 1.7;
+    position: relative;
+  }
+  .stage-transition::before {
+    content: '→';
+    font-family: var(--mono);
+    color: var(--gold);
+    margin-right: 12px;
+    font-size: 1rem;
+  }
+
+  /* ── VIDEO LIST ── */
+  .video-list { display: flex; flex-direction: column; gap: 2px; }
+
+  .video-card {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: box-shadow .2s, transform .15s;
+  }
+  .video-card:hover {
+    box-shadow: 0 4px 20px rgba(15,14,11,.1);
+    transform: translateY(-1px);
+  }
+  .video-card-inner { display: grid; grid-template-columns: 4px 1fr; }
+  .card-stripe { flex-shrink: 0; }
+  .s1 .card-stripe { background: var(--stage1); }
+  .s2 .card-stripe { background: var(--stage2); }
+  .s3 .card-stripe { background: var(--stage3); }
+  .s4 .card-stripe { background: var(--stage4); }
+  .card-body { padding: 18px 22px 18px 20px; }
+  .card-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .card-title {
+    font-family: var(--display);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 9px;
+  }
+  .card-desc {
+    font-size: .87rem;
+    color: #4a4540;
+    line-height: 1.6;
+    margin-bottom: 13px;
+  }
+  code {
+    font-family: var(--mono);
+    font-size: .82em;
+    background: #f0ebe0;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  /* ── VIDEO LINK BUTTON ── */
+  .video-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-decoration: none;
+    padding: 7px 14px;
+    border-radius: 3px;
+    border: 1.5px solid;
+    transition: all .18s;
+  }
+  .s1 .video-link { color: var(--stage1); border-color: var(--stage1); }
+  .s2 .video-link { color: var(--stage2); border-color: var(--stage2); }
+  .s3 .video-link { color: var(--stage3); border-color: var(--stage3); }
+  .s4 .video-link { color: var(--stage4); border-color: var(--stage4); }
+  .s1 .video-link:hover { background: var(--stage1); color: white; }
+  .s2 .video-link:hover { background: var(--stage2); color: white; }
+  .s3 .video-link:hover { background: var(--stage3); color: white; }
+  .s4 .video-link:hover { background: var(--stage4); color: white; }
+  .video-link[href="#LINK"] {
+    opacity: .38;
+    cursor: not-allowed;
+    pointer-events: none;
+    border-style: dashed;
+  }
+  .play-icon { width: 14px; height: 14px; fill: currentColor; }
+
+  /* ── CLOSING ── */
+  .closing {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 6px;
+    padding: 40px 44px;
+    margin-top: 16px;
+  }
+  .closing h3 {
+    font-family: var(--display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: var(--gold);
+  }
+  .closing p { font-size: .93rem; color: rgba(245,240,232,.82); line-height: 1.7; }
+  .closing p + p { margin-top: 12px; }
+  .closing code { background: rgba(255,255,255,.12); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 32px 24px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    color: var(--muted);
+    border-top: 1px solid var(--rule);
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 48px 24px 40px; }
+    main { padding: 40px 24px 60px; }
+    nav.toc { padding: 16px 20px; }
+    .closing { padding: 28px 24px; }
+    .stage-transition { padding: 22px 24px; }
+  }
+
+  /* ── FLOWCHART SECTION ── */
+  .flowchart-section {
+    background: var(--cream);
+    border-bottom: 1px solid var(--rule);
+    padding: 44px 40px;
+  }
+  .flowchart-inner { max-width: 860px; margin: 0 auto; }
+  .fc-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .flowchart {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .fc-node {
+    flex: 1;
+    min-width: 160px;
+    background: white;
+    border: 1.5px solid var(--rule);
+    border-radius: 6px;
+    padding: 20px 16px 16px;
+    text-decoration: none;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: transform .18s, box-shadow .18s, border-color .18s;
+    position: relative;
+    overflow: hidden;
+  }
+  .fc-node::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .fc-node.s1::before { background: var(--stage1); }
+  .fc-node.s2::before { background: var(--stage2); }
+  .fc-node.s3::before { background: var(--stage3); }
+  .fc-node.s4::before { background: var(--stage4); }
+  .fc-node:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(15,14,11,.14); }
+  .fc-node.s1:hover { border-color: var(--stage1); }
+  .fc-node.s2:hover { border-color: var(--stage2); }
+  .fc-node.s3:hover { border-color: var(--stage3); }
+  .fc-node.s4:hover { border-color: var(--stage4); }
+  .fc-stage-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+  .s1 .fc-stage-tag { color: var(--stage1); }
+  .s2 .fc-stage-tag { color: var(--stage2); }
+  .s3 .fc-stage-tag { color: var(--stage3); }
+  .s4 .fc-stage-tag { color: var(--stage4); }
+  .fc-node-title {
+    font-family: var(--display);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  .fc-node-sub { font-size: .78rem; color: var(--muted); line-height: 1.4; }
+  .fc-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .fc-pills span {
+    font-family: var(--mono);
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: var(--cream);
+    color: var(--muted);
+    letter-spacing: .04em;
+    transition: background .18s, color .18s;
+  }
+  .s1:hover .fc-pills span { background: #ddeeff; color: var(--stage1); }
+  .s2:hover .fc-pills span { background: #ddf5e8; color: var(--stage2); }
+  .s3:hover .fc-pills span { background: #f5e8d8; color: var(--stage3); }
+  .s4:hover .fc-pills span { background: #ede0f5; color: var(--stage4); }
+  .fc-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 8px;
+    flex-shrink: 0;
+    color: var(--muted);
+  }
+  .fc-arrow svg { width: 36px; height: 20px; }
+  .fc-arrow span {
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  @media (max-width: 700px) {
+    .flowchart-section { padding: 32px 20px; }
+    .fc-node { min-width: 130px; padding: 14px 10px 10px; }
+    .fc-node-title { font-size: .86rem; }
+    .fc-arrow svg { width: 22px; }
+    .fc-arrow span { display: none; }
+  }
+
+  /* ── INSTRUCTOR SECTION ── */
+  .instructor-section {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 60px 40px;
+  }
+  .instructor-inner { max-width: 860px; margin: 0 auto; }
+  .instructor-head {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+  .instructor-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--stage1) 0%, var(--stage4) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .instructor-kicker {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,.45);
+    margin-bottom: 6px;
+  }
+  .instructor-name {
+    font-family: var(--display);
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--gold);
+  }
+  .instructor-role { font-size: .88rem; color: rgba(245,240,232,.7); line-height: 1.6; margin-bottom: 16px; }
+  .instructor-role em { color: rgba(245,240,232,.45); font-style: normal; }
+  .instructor-links { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ilink {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .08em;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(245,240,232,.25);
+    color: rgba(245,240,232,.75);
+    text-decoration: none;
+    transition: all .18s;
+  }
+  .ilink:hover { background: rgba(245,240,232,.12); color: var(--gold); border-color: var(--gold); }
+  .instructor-body { display: flex; flex-direction: column; gap: 36px; }
+  .instructor-bio p { font-size: .9rem; color: rgba(245,240,232,.8); line-height: 1.75; }
+  .instructor-bio p + p { margin-top: 12px; }
+  .instructor-bio strong { color: var(--gold); font-weight: 600; }
+  .instructor-bio code { font-family: var(--mono); font-size: .8em; background: rgba(255,255,255,.1); padding: 1px 5px; border-radius: 3px; }
+  .instructor-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 2px;
+  }
+  .istat {
+    background: rgba(255,255,255,.05);
+    border-radius: 4px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .istat-num { font-family: var(--display); font-size: 1.5rem; font-weight: 700; color: var(--gold); line-height: 1; }
+  .istat-label { font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: rgba(245,240,232,.45); line-height: 1.4; }
+  .pkg-title { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(245,240,232,.45); margin-bottom: 12px; }
+  .pkg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 8px; }
+  .pkg-card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 4px;
+    padding: 14px 16px;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: background .18s, border-color .18s;
+  }
+  .pkg-card:hover { background: rgba(255,255,255,.1); border-color: var(--gold); }
+  .pkg-name { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .1em; color: var(--gold); }
+  .pkg-desc { font-size: .78rem; color: rgba(245,240,232,.6); line-height: 1.4; }
+  @media (max-width: 600px) {
+    .instructor-section { padding: 40px 24px; }
+    .instructor-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .pkg-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <p class="kicker">Complete Video Course &nbsp;·&nbsp; Econometrics Made Easy with Stata</p>
+    <h1>Panel Data Analysis<br><em>in Stata</em></h1>
+    <p class="header-sub">A structured playlist from raw data preparation through second-generation estimators — organised as a four-stage learning path with 63 videos across 63 topics.</p>
+    <div class="header-stats">
+      <div class="stat"><span class="stat-num">55</span><span class="stat-label">Videos</span></div>
+      <div class="stat"><span class="stat-num">4</span><span class="stat-label">Stages</span></div>
+      <div class="stat"><span class="stat-num">55</span><span class="stat-label">Live Links</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="toc-inner">
+    <span class="toc-label">Jump to</span>
+    <a href="#stage1" class="toc-pill s1">Stage 1 — Preparation (11 videos)</a>
+    <a href="#stage2" class="toc-pill s2">Stage 2 — Foundations (8 videos)</a>
+    <a href="#stage3" class="toc-pill s3">Stage 3 — Advanced (15 videos)</a>
+    <a href="#stage4" class="toc-pill s4">Stage 4 — Specialised (21 videos)</a>
+  </div>
+</nav>
+
+<div style="max-width:860px;margin:18px auto 0;padding:0 40px;">
+  <a href="https://timeseriesstata.vercel.app/" target="_blank"
+     style="display:flex;align-items:center;gap:14px;justify-content:space-between;
+            text-decoration:none;border:1px solid var(--rule);border-left:4px solid var(--stage1);
+            background:var(--cream);border-radius:6px;padding:14px 20px;color:var(--ink);">
+    <span>
+      <span style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;">Companion Course</span>
+      <span style="font-family:var(--display);font-size:1.05rem;font-weight:700;">Time Series Analysis in Stata &mdash; Complete Video Course</span>
+    </span>
+    <span style="font-family:var(--mono);font-size:12px;color:var(--stage1);white-space:nowrap;">Open &rarr;</span>
+  </a>
+</div>
+
+<!-- ═══════════════════════════ FLOWCHART ═══════════════════════════ -->
+<section class="flowchart-section">
+  <div class="flowchart-inner">
+    <p class="fc-label">Course Roadmap &mdash; Click any stage to jump directly to its videos</p>
+    <div class="flowchart">
+
+      <a href="#stage1" class="fc-node s1">
+        <div class="fc-stage-tag">Stage 1</div>
+        <div class="fc-node-title">Data Preparation</div>
+        <div class="fc-node-sub">13 videos &middot; Clean, structure &amp; declare your panel</div>
+        <div class="fc-pills">
+          <span>xtset</span><span>xtmispanel</span><span>xtbalfront</span><span>entropy&nbsp;index</span>
+        </div>
+      </a>
+
+      <div class="fc-arrow">
+        <svg viewBox="0 0 40 24" fill="none"><path d="M0 12 H32 M26 6 L38 12 L26 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>data ready</span>
+      </div>
+
+      <a href="#stage2" class="fc-node s2">
+        <div class="fc-stage-tag">Stage 2</div>
+        <div class="fc-node-title">Foundational Models</div>
+        <div class="fc-node-sub">7 videos &middot; FE, RE, DID &amp; diagnostics</div>
+        <div class="fc-pills">
+          <span>xtreg</span><span>Hausman</span><span>DID</span><span>xtpretest</span>
+        </div>
+      </a>
+
+      <div class="fc-arrow">
+        <svg viewBox="0 0 40 24" fill="none"><path d="M0 12 H32 M26 6 L38 12 L26 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>models solid</span>
+      </div>
+
+      <a href="#stage3" class="fc-node s3">
+        <div class="fc-stage-tag">Stage 3</div>
+        <div class="fc-node-title">Advanced Estimation</div>
+        <div class="fc-node-sub">17 videos &middot; ARDL, GMM, thresholds, PSM</div>
+        <div class="fc-pills">
+          <span>xtpmg</span><span>GMM</span><span>CCEMG</span><span>NARDL</span><span>FGLS</span>
+        </div>
+      </a>
+
+      <div class="fc-arrow">
+        <svg viewBox="0 0 40 24" fill="none"><path d="M0 12 H32 M26 6 L38 12 L26 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>estimation mastered</span>
+      </div>
+
+      <a href="#stage4" class="fc-node s4">
+        <div class="fc-stage-tag">Stage 4</div>
+        <div class="fc-node-title">Specialised Techniques</div>
+        <div class="fc-node-sub">26 videos &middot; Quantile, cointegration, breaks</div>
+        <div class="fc-pills">
+          <span>xtpqardl</span><span>D&ndash;H&nbsp;test</span><span>Westerlund</span><span>PVAR</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<main>
+
+  <div class="intro">
+    <p>Panel data is everywhere in applied econometrics. Firms tracked over time, countries across decades, individuals in longitudinal surveys — if your data has both a cross-sectional and a time dimension, you are in panel territory. Stata has deep support for it. The challenge is that the methods scatter across a wide range: fixed effects, GMM, ARDL, quantile regression, cointegration, structural breaks.</p>
+    <p>This playlist organises 63 videos into a sensible learning path. <strong>Work through the stages in order.</strong> Each one assumes the previous. The methods build on each other in ways that are not always obvious from the title of a single video.</p>
+  </div>
+
+  <!-- ════════════ STAGE 1 ════════════ -->
+  <section class="stage s1" id="stage1">
+    <div class="stage-header">
+      <span class="stage-badge">Stage 1</span>
+      <h2 class="stage-title">Data Preparation</h2>
+    </div>
+    <p class="stage-intro">Every analysis is only as reliable as the data behind it. Before a single model runs, you need your panel structured correctly — declared to Stata, free of gaps, clean of problem rows, and consistent across sources. This stage covers the full preparation workflow, including some often-overlooked tasks: handling repeated time values, constructing composite indices, and diagnosing missing data patterns. It is unglamorous work, but skipping it is where most analyses silently go wrong.</p>
+    <div class="video-list">
+
+      <!-- VIDEO 01 -->
+      <div class="video-card s1">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">01 / Stage 1</div>
+            <div class="card-title">Preparing Data for Panel Data Analysis — Cleaning, Graphs & Transformation</div>
+            <p class="card-desc">Start here. This video walks through the full cleaning, graphing, and transformation pipeline for a raw panel dataset — labelling variables, handling outliers, reshaping from wide to long, and producing exploratory graphs before any estimation begins.</p>
+            <a class="video-link" href="https://youtu.be/Q-Dx8xnwx9s" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 02 -->
+      <div class="video-card s1">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">02 / Stage 1</div>
+            <div class="card-title">Finding Gaps in Years / Time and Interpolating Missing Years</div>
+            <p class="card-desc">A second worked treatment of the same time-gap problem — useful if the first video left open questions. Covers additional interpolation strategies and edge cases that arise with irregular panel structures.</p>
+            <a class="video-link" href="https://youtu.be/hMuMst3k1YQ" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 03 -->
+      <div class="video-card s1">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">03 / Stage 1</div>
+            <div class="card-title">Panel Data Management in Stata — Merging, Interpolation & Frequency Transformation</div>
+            <p class="card-desc">When your data comes from multiple sources at different frequencies — annual firm data merged with quarterly macro indicators, for instance — this video covers the full merging and frequency transformation workflow in Stata.</p>
+            <a class="video-link" href="https://youtu.be/jrXFQ5G9Hc8" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 04 -->
+      <div class="video-card s1">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">04 / Stage 1</div>
+            <div class="card-title">Cleaning Panel Data for Descriptives in Common Sample &amp; Removing Missing Values</div>
+            <p class="card-desc">Before running descriptives, the panel must be reduced to a common sample so every statistic is computed on the same set of observations. This video covers removing missing rows and aligning the sample across variables, so summary statistics and later models are built on identical, comparable data rather than shifting subsets.</p>
+            <a class="video-link" href="https://youtu.be/s6zfHs_z67s" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 05 -->
+      <div class="video-card s1">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">05 / Stage 1</div>
+            <div class="card-title">Manipulating and Managing Unbalanced Panel Data</div>
+            <p class="card-desc">Unbalanced panels — where not every entity appears in every period — require special handling. This video covers the key management techniques for working with unbalanced structures without distorting your estimation sample.</p>
+            <a class="video-link" href="https://youtu.be/4UHVTCvSYCk" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 06 -->
+      <div class="video-card s1">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">06 / Stage 1</div>
+            <div class="card-title">Repeated Time Values in Panel Data — Problem & Fix</div>
+            <p class="card-desc">Duplicate time entries for the same panel unit cause <code>xtset</code> to fail and <code>xtreg</code> to give wrong results. This video diagnoses why repeated time values appear and walks through the fix — either dropping duplicates or collapsing them correctly.</p>
+            <a class="video-link" href="https://youtu.be/PB-UhLn--rg" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 07 -->
+      <div class="video-card s1">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">07 / Stage 1</div>
+            <div class="card-title">Panel Data Management in Stata (Urdu Lecture)</div>
+            <p class="card-desc">For Urdu-speaking researchers, this is a full panel data management lecture covering the same core preparation topics in Urdu — cleaning, declaring, managing time gaps, and structuring for estimation.</p>
+            <a class="video-link" href="https://youtu.be/GQRTDTbazWo" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 08 -->
+      <div class="video-card s1">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">08 / Stage 1</div>
+            <div class="card-title">Missing Value Analysis and Interpolation using XTMISPANEL</div>
+            <p class="card-desc">An extended treatment that combines missing value diagnosis with interpolation — covering both how to detect the pattern of missingness and how to fill it using the <code>xtmispanel</code> framework before passing a complete dataset to your estimator.</p>
+            <a class="video-link" href="https://youtu.be/icUZS_G3aTs" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 09 -->
+      <div class="video-card s1">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">09 / Stage 1</div>
+            <div class="card-title">Balancing Panel Data using XTBALFRONT</div>
+            <p class="card-desc">When your analysis requires a balanced panel — every entity observed in every period — this video shows how to achieve it using the <code>xtbalfront</code> command, covering the frontier-based balancing approach and when balancing is preferable to modelling the unbalancedness directly.</p>
+            <a class="video-link" href="https://youtu.be/m-AuhexYZ1A" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 10 -->
+      <div class="video-card s1">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">10 / Stage 1</div>
+            <div class="card-title">Entropy Method to Make Composite Indices in Stata</div>
+            <p class="card-desc">When multiple variables measure the same underlying concept — institutional quality, financial development, environmental performance — combining them into a single index is often preferable to entering each separately. This video covers the entropy weighting method for index construction in Stata, which avoids the subjectivity of manual weighting.</p>
+            <a class="video-link" href="https://youtu.be/kr4_u4lX9II" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 11 -->
+      <div class="video-card s1">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">11 / Stage 1</div>
+            <div class="card-title">Index Making using Factor Analysis in Stata</div>
+            <p class="card-desc">Factor analysis extracts latent dimensions from a set of correlated variables and is a principled alternative to entropy-based index construction. This video covers how to build a composite index using factor analysis in Stata and how to validate the resulting index before using it in panel regression.</p>
+            <a class="video-link" href="https://youtu.be/Rygmh6QYKpI" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-header" id="stage2" style="margin-top:54px;">
+        <span class="stage-badge" style="background:var(--stage2)">Stage 2</span>
+        <h2 class="stage-title">Model Foundations &amp; Diagnostics</h2>
+      </div>
+      <p class="stage-intro">With a clean panel in hand, this stage builds the core models — fixed and random effects, difference-in-differences — and the diagnostic tests that justify your specification before you trust a single coefficient.</p>
+
+      <!-- VIDEO 12 -->
+      <div class="video-card s2">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">12 / Stage 2</div>
+            <div class="card-title">Step-by-Step Fixed and Random Effect Models in Stata</div>
+            <p class="card-desc">The core of panel econometrics. This step-by-step video covers fixed and random effect estimation, the Hausman test, and how to interpret results correctly — including the three R-squared values Stata reports and what each one means.</p>
+            <a class="video-link" href="https://youtu.be/ZYSpW2fS3Xw" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 13 -->
+      <div class="video-card s2">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">13 / Stage 2</div>
+            <div class="card-title">Foundation and Development of Panel Data Models with Tests & Graphs</div>
+            <p class="card-desc">Theory meets practice. This video builds the conceptual foundation for panel models and then works through diagnostic tests and graphical outputs together — serial correlation, heteroskedasticity, and cross-sectional dependence checks included.</p>
+            <a class="video-link" href="https://youtu.be/vRndUgRFFmo" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 14 -->
+      <div class="video-card s2">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">14 / Stage 2</div>
+            <div class="card-title">Cross-Sectional and Panel Difference-in-Differences (DID) Estimator</div>
+            <p class="card-desc">Difference-in-differences has become one of the most-used identification strategies in applied work. This video covers both the cross-sectional and panel versions, including parallel trends, the interaction term specification, and common pitfalls in interpretation.</p>
+            <a class="video-link" href="https://youtu.be/90t1xiCz-Bo" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 15 -->
+      <div class="video-card s2">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">15 / Stage 2</div>
+            <div class="card-title">Complete Lecture on Panel Data Analysis</div>
+            <p class="card-desc">A full integrative lecture that ties the foundational pieces together — useful as a review after completing the earlier videos in this stage, or as a standalone overview before diving deeper into the advanced methods.</p>
+            <a class="video-link" href="https://youtu.be/qRulWWy5zCc" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 16 -->
+      <div class="video-card s2">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">16 / Stage 2</div>
+            <div class="card-title">Pre-Modelling Statistics using XTPRETEST</div>
+            <p class="card-desc">Before committing to a model, <code>xtpretest</code> runs the full battery of pre-estimation diagnostics — cross-sectional dependence, slope homogeneity, stationarity, and cointegration — in a single command. This video covers how to read the output and use it to justify your modelling choices to reviewers.</p>
+            <a class="video-link" href="https://youtu.be/in9ak0VlkWA" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 17 -->
+      <div class="video-card s2">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">17 / Stage 2</div>
+            <div class="card-title">Panel Regression Diagnostic Tests using XTTESTPANEL</div>
+            <p class="card-desc">Introduces <code>xttestpanel</code>, a single command that runs the essential diagnostic battery on a simple panel regression — checking the assumptions a fixed/random effects model relies on so you can confirm model validity before interpreting results.</p>
+            <a class="video-link" href="https://youtu.be/_BaTdTwLg94" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 18 -->
+      <div class="video-card s2">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">18 / Stage 2</div>
+            <div class="card-title">Comparing & Converting Coefficients using COEFCONV</div>
+            <p class="card-desc">Raw regression coefficients are often on incompatible scales, making direct comparison across variables misleading. The <code>coefconv</code> command converts and standardises coefficients so that variable contributions can be meaningfully compared within a single model.</p>
+            <a class="video-link" href="https://youtu.be/9dYYh-xipps" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 19 -->
+      <div class="video-card s2">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">19 / Stage 2</div>
+            <div class="card-title">Nomograph for Panel Data — Variable Contribution Diagnostics</div>
+            <p class="card-desc">A nomograph provides a visual summary of how much each variable contributes to the model's predicted values — more intuitive than a table of coefficients. This video covers how to produce and read a panel data nomograph in Stata.</p>
+            <a class="video-link" href="https://youtu.be/RXwFgH2RVRI" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-header" id="stage3" style="margin-top:54px;">
+        <span class="stage-badge" style="background:var(--stage3)">Stage 3</span>
+        <h2 class="stage-title">Advanced Estimation &amp; Projection</h2>
+      </div>
+      <p class="stage-intro">Where panel econometrics gets serious: dynamic ARDL families, GMM, thresholds, cointegrating estimators, spatial spillovers, and projecting fitted relationships forward. Choose estimators by what your diagnostics in Stages 1–2 revealed.</p>
+
+      <!-- VIDEO 20 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">20 / Stage 3</div>
+            <div class="card-title">Dynamic Panel ARDL (MG, PMG, DFE) Models</div>
+            <p class="card-desc">The essential trio of panel ARDL estimators. Mean Group (MG) allows fully heterogeneous slopes; Pooled Mean Group (PMG) constrains long-run coefficients to be equal; Dynamic Fixed Effects (DFE) constrains both. This video covers all three and how to choose between them using the Hausman test.</p>
+            <a class="video-link" href="https://youtu.be/dJHbEU3s_hQ" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 21 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">21 / Stage 3</div>
+            <div class="card-title">Second Generation Panel ARDL (CCEMG & AMG)</div>
+            <p class="card-desc">Standard ARDL ignores cross-sectional dependence — a serious problem in most macro panels. This video introduces CCEMG (Common Correlated Effects Mean Group) and AMG (Augmented Mean Group), the two second-generation estimators that account for it.</p>
+            <a class="video-link" href="https://youtu.be/Z41GZfsYHEA" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 22 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">22 / Stage 3</div>
+            <div class="card-title">Choosing a Panel ARDL Specification — Fourier Breaks &amp; Cross-Sectional Dependence</div>
+            <p class="card-desc">A strategic guide to selecting the correct Panel ARDL specification. Rather than a single command, this walks through how diagnostic tests for structural breaks (Fourier terms) and cross-sectional dependence steer you toward the right ARDL variant — first vs. second generation, with or without Fourier augmentation.</p>
+            <a class="video-link" href="https://youtu.be/HiFei1sWCy0" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 23 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">23 / Stage 3</div>
+            <div class="card-title">Dynamic/Static Panel Models with Endogeneity & Thresholds</div>
+            <p class="card-desc">When your regressors are endogenous or your relationship shifts at some estimated cutoff, standard panel models are misspecified. This video covers both threshold specifications and endogeneity-robust estimation together.</p>
+            <a class="video-link" href="https://youtu.be/PU9_6WeXeUg" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 24 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">24 / Stage 3</div>
+            <div class="card-title">Panel Fixed Effect Threshold Regression with Multiple Variables</div>
+            <p class="card-desc">An extension of the threshold regression framework to settings where multiple regressors interact with the threshold variable simultaneously. This video covers implementation and interpretation of multi-variable threshold specifications.</p>
+            <a class="video-link" href="https://youtu.be/WG_t3C3FTk4" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 25 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">25 / Stage 3</div>
+            <div class="card-title">Panel GMM Models — Extended Treatment</div>
+            <p class="card-desc">A second, complementary video on panel GMM that addresses scenarios left open in the first — including instrument proliferation, weak instrument diagnostics, and how to handle the collapse option to control instrument count.</p>
+            <a class="video-link" href="https://youtu.be/fv5HLjmtkGU" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 26 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">26 / Stage 3</div>
+            <div class="card-title">FGLS Model for Panel Data — Large N, Small T</div>
+            <p class="card-desc">Feasible Generalised Least Squares is the preferred estimator when you have many cross-sections observed over few time periods. This video covers the <code>xtgls</code> command, when FGLS outperforms OLS, and how to handle heteroskedasticity and autocorrelation within the FGLS framework.</p>
+            <a class="video-link" href="https://youtu.be/auSTOFVM8ls" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 27 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">27 / Stage 3</div>
+            <div class="card-title">Polynomial Regression for Nonlinear Relations across Cross-Sections</div>
+            <p class="card-desc">When the relationship between two variables follows a curve rather than a line — an inverted-U, for instance — linear panel models miss it. This video covers polynomial regression in a panel context to detect and visualise nonlinear relationships across cross-sections.</p>
+            <a class="video-link" href="https://youtu.be/vqlbZ-W26wM" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 28 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">28 / Stage 3</div>
+            <div class="card-title">Turning Point Test for Quadratic Panel Models</div>
+            <p class="card-desc">A quadratic model implies a turning point — but that turning point is only meaningful if it falls within the data range and is statistically significant. This video covers the formal turning point test for quadratic panel specifications, ensuring the identified inflection point is both real and interpretable.</p>
+            <a class="video-link" href="https://youtu.be/pW3n_pgZQXI" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 29 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">29 / Stage 3</div>
+            <div class="card-title">Panel CSARDL Model</div>
+            <p class="card-desc">The Cross-Sectionally Augmented ARDL (CSARDL) model accounts for cross-sectional dependence within an ARDL framework by augmenting the model with cross-section averages of the dependent variable and regressors. This video covers the CSARDL estimator, its advantages over standard panel ARDL, and implementation in Stata.</p>
+            <a class="video-link" href="https://youtu.be/S_KjERv6kPk" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 30 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">30 / Stage 3</div>
+            <div class="card-title">CUPFM Model for Panel Data</div>
+            <p class="card-desc">The Common Unit-root Process Factor Model (CUPFM) is a panel estimator that accounts for cross-sectional dependence through common factors — related to the CCE family but with a distinct estimation approach. This video covers when to use it and how to implement and interpret it in Stata.</p>
+            <a class="video-link" href="https://youtu.be/6sKWr51uCaA" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 31 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">31 / Stage 3</div>
+            <div class="card-title">Second Generation Panel Models — Endogeneity & Cross-Sectional Dependence (XTIVREG2 & XTCCE)</div>
+            <p class="card-desc">When both endogeneity and cross-sectional dependence are present simultaneously, neither standard IV nor first-generation panel estimators are sufficient. This video covers <code>xtivreg2</code> for IV estimation with cross-sectionally robust standard errors, and <code>xtcce</code> for common correlated effects estimation.</p>
+            <a class="video-link" href="https://youtu.be/ls8wKZiU7j8" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 32 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">32 / Stage 3</div>
+            <div class="card-title">Robust Modelling using Propensity Score Matching (PSM)</div>
+            <p class="card-desc">Propensity Score Matching isolates treatment effects by constructing a comparison group that is statistically similar to the treated group on observable characteristics. In panel settings, PSM is used to assess whether key findings hold after matching — making it a powerful robustness check. This video covers PSM implementation in Stata and how to integrate matched samples with panel estimators.</p>
+            <a class="video-link" href="https://youtu.be/wvESE_fkNZA" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 33 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">33 / Stage 3</div>
+            <div class="card-title">Panel Spatial Econometrics — Spillovers &amp; Geographic Dependence (XSMLE)</div>
+            <p class="card-desc">A comprehensive long-form lecture (3+ hours) on spatial panel data. Covers modelling geographic dependence with spatial weight matrices and decomposing effects into direct, indirect, and total spillovers — typically implemented in Stata with <code>xsmle</code> (community) or <code>spxtregress</code> (official).</p>
+            <a class="video-link" href="https://youtu.be/DepU10EtgvY" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 34 -->
+      <div class="video-card s3">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">34 / Stage 3</div>
+            <div class="card-title">Projecting Independent Variables using REGPROJECT</div>
+            <p class="card-desc">Uses <code>regproject</code> to generate forward projections of independent variables — useful for scenario building and out-of-sample forecasting once a model is estimated. This is the "Project" half of the estimate-and-project workflow, and is one of the instructor’s own SSC-archive packages.</p>
+            <a class="video-link" href="https://youtu.be/G6QivqE_Guo" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-header" id="stage4" style="margin-top:54px;">
+        <span class="stage-badge" style="background:var(--stage4)">Stage 4</span>
+        <h2 class="stage-title">Specialised Models &amp; Tests</h2>
+      </div>
+      <p class="stage-intro">Distributional, nonlinear, and second-generation methods for harder problems — quantile ARDL, causality tests, unit-root and cointegration testing under cross-sectional dependence, and publication-ready effect visualisation.</p>
+
+      <!-- VIDEO 35 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">35 / Stage 4</div>
+            <div class="card-title">Quantile-Wise Coefficient Plots using PQR</div>
+            <p class="card-desc">Visualising quantile coefficients across the distribution makes results interpretable in a way that coefficient tables cannot. This video uses the <code>PQR</code> command to produce publication-ready coefficient plots across quantiles.</p>
+            <a class="video-link" href="https://youtu.be/RikGNzujJr4" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 36 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">36 / Stage 4</div>
+            <div class="card-title">Panel Quantile ARDL using XTPQARDL</div>
+            <p class="card-desc">The <code>xtpqardl</code> command provides a dedicated Stata implementation for panel quantile ARDL. This video walks through its syntax, options, and how to interpret the long-run and short-run quantile output.</p>
+            <a class="video-link" href="https://youtu.be/KO6KNrtvvro" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 37 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">37 / Stage 4</div>
+            <div class="card-title">Second Generation Panel Quantile ARDL</div>
+            <p class="card-desc">This video extends panel quantile ARDL to account for cross-sectional dependence — combining the distributional flexibility of quantile estimation with the cross-sectional robustness of second-generation panel methods.</p>
+            <a class="video-link" href="https://youtu.be/egj4BPH-Z7U" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 38 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">38 / Stage 4</div>
+            <div class="card-title">Panel Non-Linear ARDL using PNARDL</div>
+            <p class="card-desc">Non-linear panel ARDL using the <code>pnardl</code> command covers asymmetric long-run effects estimated within a panel ARDL structure — allowing positive and negative shocks to have separate long-run paths.</p>
+            <a class="video-link" href="https://youtu.be/DTd5ihvMggQ" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 39 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">39 / Stage 4</div>
+            <div class="card-title">Second Generation Panel NARDL — Nonlinear ARDL with Cross-Sectional Dependence</div>
+            <p class="card-desc">Extends the nonlinear panel ARDL (<code>pnardl</code>) into a second-generation framework that corrects for cross-sectional correlation across units. Combines asymmetric long-run/short-run decomposition with common-factor robustness for valid inference in dependent panels.</p>
+            <a class="video-link" href="https://youtu.be/SYytNnO2QaQ" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 40 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">40 / Stage 4</div>
+            <div class="card-title">Quantile-on-Quantile Regression for Panel Data</div>
+            <p class="card-desc">Quantile-on-quantile regression examines how one variable's quantiles affect another variable's quantiles — a more flexible method for distributional relationships than standard quantile regression. This video covers the panel implementation.</p>
+            <a class="video-link" href="https://youtu.be/l2OIGX9QJe4" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 41 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">41 / Stage 4</div>
+            <div class="card-title">Entity-Specific Quantile Effects in Panel Quantile Models</div>
+            <p class="card-desc">In a panel quantile setup, each entity sits at a different position within the conditional distribution — so the relevant quantile is entity-specific, not a single fixed level. This video covers how to generate and interpret effects at each country- or firm-specific quantile position, producing a richer picture of heterogeneity than standard quantile regression tables.</p>
+            <a class="video-link" href="https://youtu.be/8qydwNJo2sw" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 42 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">42 / Stage 4</div>
+            <div class="card-title">Panel VAR Models — Extended Application</div>
+            <p class="card-desc">A second Panel VAR video covering additional topics: lag selection criteria, Granger causality in the VAR framework, forecast error variance decomposition, and how to handle cross-sectional heterogeneity in VAR specifications.</p>
+            <a class="video-link" href="https://youtu.be/jl_aqw7Uzhc" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 43 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">43 / Stage 4</div>
+            <div class="card-title">Static Panel Data with Driscoll & Kraay Standard Errors</div>
+            <p class="card-desc">Driscoll-Kraay standard errors are robust to heteroskedasticity, autocorrelation, and cross-sectional dependence simultaneously — via the <code>xtscc</code> command. This video covers when they are appropriate and how to implement them correctly.</p>
+            <a class="video-link" href="https://youtu.be/SmjXJ3_GCtw" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 44 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">44 / Stage 4</div>
+            <div class="card-title">Dumitrescu & Hurlin Panel Non-Causality Test</div>
+            <p class="card-desc">The Dumitrescu-Hurlin test is the standard approach for panel Granger non-causality in heterogeneous panels. This video covers the test, the W-bar and Z-bar statistics, and how to interpret results — including the bootstrap variant for cross-sectionally dependent panels.</p>
+            <a class="video-link" href="https://youtu.be/Apn3vDpWUQA" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 45 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">45 / Stage 4</div>
+            <div class="card-title">Causality Testing: Fourier Toda-Yamamoto & Quantile Causality</div>
+            <p class="card-desc">When causal relationships are nonlinear or the standard Granger framework is too restrictive, the Fourier Toda-Yamamoto approach captures smooth structural shifts, while quantile causality tests whether the causal relationship holds across the full distribution. This video covers both methods and their complementary roles in a thorough causality analysis.</p>
+            <a class="video-link" href="https://youtu.be/w6zSRWPWt8g" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 46 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">46 / Stage 4</div>
+            <div class="card-title">Panel Negative Binomial & Poisson Regression — Extended Treatment</div>
+            <p class="card-desc">A deeper follow-up on count data panel models, covering marginal effects interpretation, zero-inflation issues, fixed vs random effects specifications for count models, and publication-ready output formatting.</p>
+            <a class="video-link" href="https://youtu.be/DPdlmxXpw5A" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 47 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">47 / Stage 4</div>
+            <div class="card-title">Panel Quantile Unit Root Tests with Breaks</div>
+            <p class="card-desc">Unit root tests that account for quantile-specific behaviour and structural breaks — going beyond first- and second-generation panel unit root tests to detect non-stationarity at specific quantiles of the distribution.</p>
+            <a class="video-link" href="https://youtu.be/kzRvMk2NaTQ" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 48 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">48 / Stage 4</div>
+            <div class="card-title">Structural Break Detection in Panel Data</div>
+            <p class="card-desc">Structural breaks in panel data can invalidate long-run estimates if ignored. This video covers detection methods for identifying breakpoints in panel series — essential before cointegration testing when regime shifts are plausible.</p>
+            <a class="video-link" href="https://youtu.be/E3faBtBAm04" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 49 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">49 / Stage 4</div>
+            <div class="card-title">Slope Homogeneity Tests across Quantiles</div>
+            <p class="card-desc">Testing whether slopes are homogeneous across quantiles is a diagnostic step before pooling in quantile panel models. This video covers the relevant tests and what to do when homogeneity is rejected.</p>
+            <a class="video-link" href="https://youtu.be/pTX1sGO89kw" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 50 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">50 / Stage 4</div>
+            <div class="card-title">Cross-Sectional Dependence across Quantiles</div>
+            <p class="card-desc">Cross-sectional dependence varies across the distribution. This video covers how to test for it at different quantile levels — informing whether second-generation estimators are needed at specific parts of the conditional distribution.</p>
+            <a class="video-link" href="https://youtu.be/t1uabHndkPg" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 51 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">51 / Stage 4</div>
+            <div class="card-title">Second Generation Panel Unit Root Tests</div>
+            <p class="card-desc">Tests for unit roots when cross-sectional dependence is present, where first-generation tests (LLC, IPS) are biased. Covers second-generation procedures such as Pesaran’s CIPS/CADF — implemented via commands like <code>xtcips</code>, <code>pescadf</code> or <code>multipurt</code> — as the correct pre-cointegration step in dependent panels.</p>
+            <a class="video-link" href="https://youtu.be/CY9gihzoB8I" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 52 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">52 / Stage 4</div>
+            <div class="card-title">Second Generation Panel Cointegration Tests with Breaks</div>
+            <p class="card-desc">Second-generation panel cointegration tests account for cross-sectional dependence, which first-generation tests (Pedroni, Kao) ignore. This video covers the key procedures combining cross-sectional robustness with structural break allowance.</p>
+            <a class="video-link" href="https://youtu.be/z46tTp58ci4" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 53 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">53 / Stage 4</div>
+            <div class="card-title">Bootstrap Panel Cointegration Test (Westerlund & Edgerton 2007)</div>
+            <p class="card-desc">The Westerlund-Edgerton bootstrap cointegration test is robust to both cross-sectional dependence and structural breaks simultaneously. This video rounds out the cointegration toolkit and is the recommended test when both problems are present in your panel.</p>
+            <a class="video-link" href="https://youtu.be/nX9y5q10wP8" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 54 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">54 / Stage 4</div>
+            <div class="card-title">Second Generation Panel Quantile Regression</div>
+            <p class="card-desc">Standard quantile regression for panel data does not account for cross-sectional dependence. This video covers second-generation panel quantile regression — combining distributional estimation with common factor correction for valid inference across quantiles.</p>
+            <a class="video-link" href="https://youtu.be/4U5F7_W1GKg" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO 55 -->
+      <div class="video-card s4">
+        <div class="video-card-inner">
+          <div class="card-stripe"></div>
+          <div class="card-body">
+            <div class="card-num">55 / Stage 4</div>
+            <div class="card-title">Visualising Quadratic & Moderator Effects in Panel Data</div>
+            <p class="card-desc">Polynomial and interaction terms produce results that coefficient tables alone cannot communicate. This video covers how to visualise quadratic relationships and moderator effects in panel data — producing marginal effect plots and interaction graphs that make nonlinear dynamics immediately readable for papers and presentations.</p>
+            <a class="video-link" href="https://youtu.be/MaI-BAC49xw" target="_blank">
+              <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Watch Video
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="closing">
+    <h3>A note on sequencing</h3>
+    <p>Stages 1 and 2 are prerequisites, not suggestions. If your panel is not declared correctly, commands like <code>xtreg</code> and <code>xtdpd</code> will either fail or silently produce wrong results. If you do not understand what fixed effects are doing, the logic of GMM instruments will not make sense when you reach Stage 3.</p>
+    <p>Stages 3 and 4 have more flexibility depending on your research focus. If you are working on cointegration, you can pull those Stage 4 videos in after finishing Stage 3. If your interest is distributional analysis, the quantile videos can run alongside the Stage 3 estimators. The more foundation you have before specialising, the better your instincts will be when something goes wrong — and in panel econometrics, something usually does.</p>
+    <p>The course is long. That seems right. These methods are genuinely hard to use well, and the places where they tend to break are not always obvious until a reviewer asks a question you should have been asking yourself.</p>
+  </div>
+
+</main>
+
+
+<!-- ═══════════════════════════ INSTRUCTOR ═══════════════════════════ -->
+<section class="instructor-section" id="instructor">
+  <div class="instructor-inner">
+
+    <div class="instructor-head">
+      <div class="instructor-avatar">NA</div>
+      <div class="instructor-title-block">
+        <p class="instructor-kicker">Your Instructor</p>
+        <h2 class="instructor-name">Dr. Noman Arshed</h2>
+        <p class="instructor-role">
+          Senior Lecturer, Department of Business Analytics<br>
+          Sunway Business School &middot; Sunway University, Malaysia<br>
+          <em>AACSB Accredited &middot; Program Leader, MsBA ODL</em>
+        </p>
+        <div class="instructor-links">
+          <a href="https://scholar.google.com/citations?user=oUfi6FQAAAAJ&hl=en" target="_blank" class="ilink">Google Scholar</a>
+          <a href="https://www.scopus.com/authid/detail.uri?authorId=57190409735" target="_blank" class="ilink">Scopus</a>
+          <a href="https://www.webofscience.com/wos/author/record/O-6966-2019" target="_blank" class="ilink">Web of Science</a>
+          <a href="https://orcid.org/0000-0002-8940-5391" target="_blank" class="ilink">ORCID</a>
+          <a href="https://pk.linkedin.com/pub/noman-arshed/19/b51/67a" target="_blank" class="ilink">LinkedIn</a>
+          <a href="https://econistics.com" target="_blank" class="ilink">Econistics.com</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="instructor-body">
+
+      <div class="instructor-bio">
+        <p>Dr. Noman Arshed is an applied econometrician whose work spans environmental economics, Islamic finance, institutional quality, energy economics, and panel data methodology. He holds a PhD in Islamic Banking &amp; Finance from UMT Pakistan, an MSc in Economics &amp; Finance from the <strong>University of Edinburgh</strong>, and a BSc (Honours) in Economics from Forman Christian College University. With over ten years of teaching experience across undergraduate, MPhil, MBA, and PhD levels in Pakistan and Malaysia, his courses have consistently drawn student satisfaction scores above 90%.</p>
+        <p>He is currently Senior Lecturer and Program Leader for the Masters of Business Analytics (ODL) at <strong>Sunway Business School</strong>, an AACSB-accredited institution. In 2025 he received both the Outstanding Quantity and Quality of Research Award and the Immersion and Mobility Program Award at Sunway. He is ranked in the top 0.13% of scholars globally by ScholarGPS (2024) and 11th among the top 25% of authors by 10-year publication record on IDEAS/REPEC.</p>
+        <p>Beyond research and teaching, Dr. Arshed runs <strong>Econistics.com</strong> &mdash; an applied econometrics education platform &mdash; and the YouTube channel <em>Econometrics Made Easy with Stata</em>, from which this course is drawn. He has authored <em>Applied Cross-Sectional Econometrics</em> (KSP Books, 2020) and developed five open-source Stata packages on the Boston College SSC archive: <code>xtqrplot</code>, <code>coefconv</code>, <code>regproject</code>, <code>qmodplot</code>, and <code>xtbalfront</code>.</p>
+      </div>
+
+      <div class="instructor-stats-grid">
+        <div class="istat"><span class="istat-num">203</span><span class="istat-label">Journal Articles &amp; Chapters</span></div>
+        <div class="istat"><span class="istat-num">3,978</span><span class="istat-label">Google Scholar Citations</span></div>
+        <div class="istat"><span class="istat-num">h&thinsp;=&thinsp;33</span><span class="istat-label">h-index (Google Scholar)</span></div>
+        <div class="istat"><span class="istat-num">110</span><span class="istat-label">Scopus-Listed Papers</span></div>
+        <div class="istat"><span class="istat-num">356</span><span class="istat-label">Total Impact Factor</span></div>
+        <div class="istat"><span class="istat-num">10+</span><span class="istat-label">Years Teaching</span></div>
+        <div class="istat"><span class="istat-num">6</span><span class="istat-label">PhD Students Supervised</span></div>
+        <div class="istat"><span class="istat-num">Top 0.13%</span><span class="istat-label">ScholarGPS Global Rank 2024</span></div>
+      </div>
+
+      <div class="instructor-packages">
+        <p class="pkg-title">Open-Source Stata Packages &mdash; Boston College SSC</p>
+        <div class="pkg-grid">
+          <a href="https://ideas.repec.org/c/boc/bocode/s459658.html" target="_blank" class="pkg-card">
+            <span class="pkg-name">XTQRPLOT</span>
+            <span class="pkg-desc">Entity-specific marginal effects from panel quantile regression</span>
+          </a>
+          <a href="https://ideas.repec.org/c/boc/bocode/s459660.html" target="_blank" class="pkg-card">
+            <span class="pkg-name">COEFCONV</span>
+            <span class="pkg-desc">Comprehensive marginal effects &amp; coefficient conversion</span>
+          </a>
+          <a href="https://ideas.repec.org/c/boc/bocode/s459661.html" target="_blank" class="pkg-card">
+            <span class="pkg-name">REGPROJECT</span>
+            <span class="pkg-desc">Post-estimation projection and boundary analysis</span>
+          </a>
+          <a href="https://ideas.repec.org/c/boc/bocode/s459665.html" target="_blank" class="pkg-card">
+            <span class="pkg-name">QMODPLOT</span>
+            <span class="pkg-desc">Quadratic moderation plots with confidence bands</span>
+          </a>
+          <a href="https://ideas.repec.org/c/boc/bocode/s459699.html" target="_blank" class="pkg-card">
+            <span class="pkg-name">XTBALFRONT</span>
+            <span class="pkg-desc">Balance frontier diagnostics for unbalanced panels</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<footer>
+  Panel Data Analysis in Stata · Econometrics Made Easy with Stata · 55 videos · 55 links active
+</footer>
+
+</body>
+</html>
